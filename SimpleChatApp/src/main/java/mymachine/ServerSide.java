@@ -36,38 +36,35 @@ class ServerSide {
                 Socket newClientSocket = serverSocket.accept();
 
                 // establish a thread for listening messages from clients.
-                Thread readerThread = new Thread(new Runnable() {
-                    @Override   
-                    public void run() {
-                        try (
-                            // to save current client socket.
-                            Socket clientSocket = newClientSocket;
-                            // establish a writer to send messages to the client.
-                            PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true);
-                            // establish a character buffer stream 
-                            // to receive messages from clients.
-                            BufferedReader reader = new BufferedReader(
-                                new InputStreamReader(clientSocket.getInputStream()))
-                        ) {
-                            // add the writer to the writer list. 
-                            clientWriters.add(writer);
-            
-                            // message from the client.  
-                            String message;
-                            while ((message = reader.readLine()) != null ) {
-                                // send the received message from the client to all clients. 
-                                for (PrintWriter clientWriter : clientWriters)
-                                    clientWriter.println("[" + clientSocket.getRemoteSocketAddress() 
-                                        + "]: " + message); 
-                                
-                                    // check.
-                                System.out.println("Server received: " + message);
-                            }
-                        } catch (Exception e) { e.printStackTrace(); } 
-                        
-                        // check.
-                        System.out.println("Disconnected a connection, ended thread.");
-                    }
+                Thread readerThread = new Thread(() -> {
+                    try (
+                        // to save current client socket.
+                        Socket clientSocket = newClientSocket;
+                        // establish a writer to send messages to the client.
+                        PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true);
+                        // establish a character buffer stream 
+                        // to receive messages from clients.
+                        BufferedReader reader = new BufferedReader(
+                            new InputStreamReader(clientSocket.getInputStream()))
+                    ) {
+                        // add the writer to the writer list. 
+                        clientWriters.add(writer);
+        
+                        // message from the client.  
+                        String message;
+                        while ((message = reader.readLine()) != null ) {
+                            // send the received message from the client to all clients. 
+                            for (PrintWriter clientWriter : clientWriters)
+                                clientWriter.println("[" + clientSocket.getRemoteSocketAddress() 
+                                    + "]: " + message); 
+                            
+                                // check.
+                            System.out.println("Server received: " + message);
+                        }
+                    } catch (Exception e) { e.printStackTrace(); } 
+                    
+                    // check.
+                    System.out.println("Disconnected a connection, ended thread.");
                 });
 
                 readerThread.start();
