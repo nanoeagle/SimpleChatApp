@@ -112,7 +112,7 @@ public class SimpleChatApp extends Application {
                 while ((incomingMsg = reader.readLine()) != null) {
                     // dummy string for use in a lambda or an anonymous class. 
                     String dummyInMsg = incomingMsg;
-                    // for accessing JFX App Threzad GUI node from another thread.  
+                    // for accessing JFX App Thread's GUI node from another thread.  
                     Platform.runLater(() -> {
                         // seperate the received message into sender and content.
                         String[] msgParts = dummyInMsg.split("]: ", 2);
