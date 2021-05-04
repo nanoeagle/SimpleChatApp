@@ -20,18 +20,24 @@ import java.util.*;
  */
 
 class ServerSide {
+    // Use a constant-like variable for the port number 
+    // which is rarely changed.
+    public static final int SERVER_SOCKET_NUM = 4242;
+    
     public static void main(String[] args) {
         new ServerSide().go();
     }
 
     private void go() {
         // establish the server socket for connection from client.
-        try (ServerSocket serverSocket = new ServerSocket(4242)) {
+        try (ServerSocket serverSocket = new ServerSocket(SERVER_SOCKET_NUM)) {
             // establish writers for sending messages to all clients.
             ArrayList<PrintWriter> clientWriters = new ArrayList<>();
 
             // the server always run.
-            while (true) {
+            // To explicitly know the fact that while server is running, do stuffs.
+            boolean isRunning = true;
+            while (isRunning) {
                 // establish a socket for connection to new client.
                 Socket newClientSocket = serverSocket.accept();
 
@@ -41,14 +47,15 @@ class ServerSide {
                         // to save current client socket.
                         Socket clientSocket = newClientSocket;
                         // establish a writer to send messages to the client.
-                        PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true);
+                        // make the writer more exlicit.
+                        PrintWriter clientWriter = new PrintWriter(clientSocket.getOutputStream(), true);
                         // establish a character buffer stream 
                         // to receive messages from clients.
                         BufferedReader reader = new BufferedReader(
                             new InputStreamReader(clientSocket.getInputStream()))
                     ) {
                         // add the writer to the writer list. 
-                        clientWriters.add(writer);
+                        clientWriters.add(clientWriter);
         
                         // message from the client.  
                         String message;

@@ -28,12 +28,17 @@ import javafx.stage.Stage;
  */
 
 public class SimpleChatApp extends Application {
+    // Use a constant-like variable for the host name 
+    // which is rarely changed.
+    public static final String HOST = "localhost";
+    
     private Socket socketToServer;
-
     private TextArea incoming;
-    private BufferedReader reader;
+    // make the reader more explicit.
+    private BufferedReader serverReader;
     private TextField outgoing;
-    private PrintWriter writer;
+    // make the writer more explicit.
+    private PrintWriter serverWriter;
 
     static void launchApp(String[] args) {
         launch(args);
@@ -47,11 +52,11 @@ public class SimpleChatApp extends Application {
     private void setUpNetwork() {
         try {
             // establish a connection to the chat server.
-            socketToServer = new Socket("localhost", 4242);
+            socketToServer = new Socket(HOST, ServerSide.SERVER_SOCKET_NUM);
             // establish a character stream to write messages to server.
-            writer = new PrintWriter(socketToServer.getOutputStream(), true);
+            serverWriter = new PrintWriter(socketToServer.getOutputStream(), true);
             // establish a character buffer stream to receive messages from the server.
-            reader = new BufferedReader(
+            serverReader = new BufferedReader(
                 new InputStreamReader(socketToServer.getInputStream()));
             
             // check.
@@ -92,7 +97,7 @@ public class SimpleChatApp extends Application {
             String outgoingMsg = outgoing.getText();
 
             if ( !outgoingMsg.equals("") ) {
-                writer.println(outgoingMsg);
+                serverWriter.println(outgoingMsg);
                 outgoing.setText("");
                 outgoing.requestFocus();
             }
@@ -109,7 +114,7 @@ public class SimpleChatApp extends Application {
             try {
                 String incomingMsg;
                 
-                while ((incomingMsg = reader.readLine()) != null) {
+                while ((incomingMsg = serverReader.readLine()) != null) {
                     // dummy string for use in a lambda or an anonymous class. 
                     String dummyInMsg = incomingMsg;
                     // for accessing JFX App Thread's GUI node from another thread.  
@@ -154,10 +159,10 @@ public class SimpleChatApp extends Application {
         try { if (socketToServer != null) socketToServer.close(); }
         catch (Exception e) { e.printStackTrace(); }
 
-        try { if (reader != null) reader.close(); } 
+        try { if (serverReader != null) serverReader.close(); } 
         catch (Exception e) { e.printStackTrace(); }
 
-        try { if (writer != null) writer.close(); } 
+        try { if (serverWriter != null) serverWriter.close(); } 
         catch (Exception e) { e.printStackTrace(); }
        
         // check.
