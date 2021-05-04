@@ -22,7 +22,7 @@ import java.util.*;
 class ServerSide {
     // Use a constant-like variable for the port number 
     // which is rarely changed.
-    private final int SERVER_SOCKET_NUM = 4242;
+    public static final int SERVER_SOCKET_NUM = 4242;
     
     public static void main(String[] args) {
         new ServerSide().go();
